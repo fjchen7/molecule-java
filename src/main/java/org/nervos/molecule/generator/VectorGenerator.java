@@ -46,13 +46,12 @@ public abstract class VectorGenerator extends AbstractConcreteGenerator {
                 .addStatement("return $N.length", items)
                 .build();
 
-        MethodSpec getItemType =
-                MethodSpec.methodBuilder("getItemType")
-                        .addModifiers(Modifier.PUBLIC)
-                        .returns(Class.class)
-                        .addAnnotation(Override.class)
-                        .addStatement("return $N", itemType)
-                        .build();
+        MethodSpec getItemType = MethodSpec.methodBuilder("getItemType")
+                .addModifiers(Modifier.PUBLIC)
+                .returns(Class.class)
+                .addAnnotation(Override.class)
+                .addStatement("return $N", itemType)
+                .build();
 
         typeBuilder
                 .addField(itemType)
@@ -71,8 +70,8 @@ public abstract class VectorGenerator extends AbstractConcreteGenerator {
                 .addModifiers(Modifier.PUBLIC).returns(builderClassName);
         if (!isItemOption) {
             methodAddBuilder
-                    .addParameter(
-                            ParameterSpec.builder(itemTypeName, "item").addAnnotation(Nonnull.class).build())
+                    .addParameter(ParameterSpec.builder(itemTypeName, "item")
+                            .addAnnotation(Nonnull.class).build())
                     .addStatement("$T.requireNonNull(item)", Objects.class);
         } else {
             methodAddBuilder.addParameter(itemTypeName, "item");
@@ -114,8 +113,7 @@ public abstract class VectorGenerator extends AbstractConcreteGenerator {
                 .endControlFlow()
                 .addStatement("$T[] tempItems = new $T[items.length - 1]", itemTypeName, itemTypeName)
                 .addStatement("$T.arraycopy(items, 0, tempItems, 0, i)", System.class)
-                .addStatement(
-                        "$T.arraycopy(items, i + 1, tempItems, i, items.length - i -1)", System.class)
+                .addStatement("$T.arraycopy(items, i + 1, tempItems, i, items.length - i -1)", System.class)
                 .addStatement("items = tempItems")
                 .addStatement("return this")
                 .build();

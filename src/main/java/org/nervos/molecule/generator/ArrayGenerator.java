@@ -28,8 +28,8 @@ public class ArrayGenerator extends AbstractConcreteGenerator {
                 .initializer("$T.class", itemTypeName)
                 .build();
 
-        FieldSpec.Builder itemSizeBuilder =
-                FieldSpec.builder(int.class, "ITEM_SIZE").addModifiers(Modifier.PUBLIC, Modifier.STATIC);
+        FieldSpec.Builder itemSizeBuilder = FieldSpec.builder(int.class, "ITEM_SIZE")
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC);
         if (itemTypeName == TypeName.BYTE) {
             itemSizeBuilder.initializer("1");
         } else {
@@ -112,18 +112,13 @@ public class ArrayGenerator extends AbstractConcreteGenerator {
 
         MethodSpec.Builder constructorBufBuilder = constructorBufBuilder()
                 .beginControlFlow("if (buf.length != $N)", size)
-                .addStatement(
-                        "throw new $T($N, buf.length, $T.class)",
-                        base.classNameMoleculeException,
-                        size,
-                        className)
+                .addStatement("throw new $T($N, buf.length, $T.class)", base.classNameMoleculeException, size, className)
                 .endControlFlow();
 
         if (itemTypeName != TypeName.BYTE) {
             constructorBufBuilder
                     .beginControlFlow("for (int i = 0; i < $N; i++)", itemCount)
-                    .addStatement(
-                            "byte[] itemBuf = Arrays.copyOfRange(buf, i * $N, (i + 1) * $N)", itemSize, itemSize)
+                    .addStatement("byte[] itemBuf = Arrays.copyOfRange(buf, i * $N, (i + 1) * $N)", itemSize, itemSize)
                     .addStatement("items[i] = $T.builder(itemBuf).build()", itemTypeName)
                     .endControlFlow();
         } else {
@@ -134,8 +129,8 @@ public class ArrayGenerator extends AbstractConcreteGenerator {
                 .addModifiers(Modifier.PUBLIC)
                 .returns(builderClassName)
                 .addParameter(int.class, "i")
-                .addParameter(
-                        ParameterSpec.builder(itemTypeName, "item").addAnnotation(Nonnull.class).build())
+                .addParameter(ParameterSpec.builder(itemTypeName, "item")
+                        .addAnnotation(Nonnull.class).build())
                 .addStatement("$T.requireNonNull(item)", Objects.class)
                 .addStatement("items[i] = item")
                 .addStatement("return this")
@@ -151,11 +146,7 @@ public class ArrayGenerator extends AbstractConcreteGenerator {
             buildBuilder
                     .addStatement("byte[] buf = new byte[$N]", size)
                     .beginControlFlow("for (int i = 0; i < $N; i++)", itemCount)
-                    .addStatement(
-                            "$T.setBytes($N[i].getRawData(), buf, i * $N)",
-                            base.classNameMoleculeUtils,
-                            items,
-                            itemSize)
+                    .addStatement("$T.setBytes($N[i].getRawData(), buf, i * $N)", base.classNameMoleculeUtils, items, itemSize)
                     .endControlFlow()
                     .addStatement("$T a = new $T()", itemTypeName, itemTypeName)
                     .addStatement("a.buf = buf");
