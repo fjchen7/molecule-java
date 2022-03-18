@@ -8,101 +8,101 @@ import org.nervos.molecule.generated.base.MoleculeUtils;
 import org.nervos.molecule.generated.base.Table;
 
 public final class UncleBlock extends Table {
-  public static int FIELD_COUNT = 2;
+    public static int FIELD_COUNT = 2;
 
-  private Header header;
-
-  private ProposalShortIdVec proposals;
-
-  private UncleBlock() {
-  }
-
-  @Nonnull
-  public Header getHeader() {
-    return header;
-  }
-
-  @Nonnull
-  public ProposalShortIdVec getProposals() {
-    return proposals;
-  }
-
-  public static Builder builder() {
-    return new Builder();
-  }
-
-  public static Builder builder(@Nonnull byte[] buf) {
-    return new Builder(buf);
-  }
-
-  public static final class Builder {
     private Header header;
 
     private ProposalShortIdVec proposals;
 
-    private Builder() {
-      header = Header.builder().build();
-      proposals = ProposalShortIdVec.builder().build();
+    private UncleBlock() {
     }
 
-    private Builder(@Nonnull byte[] buf) {
-      Objects.requireNonNull(buf);
-      int size = MoleculeUtils.littleEndianBytes4ToInt(buf, 0);
-      if (buf.length != size) {
-        throw new MoleculeException(size, buf.length, UncleBlock.class);
-      }
-      int[] offsets = MoleculeUtils.getOffsets(buf);
-      if (offsets.length - 1 != FIELD_COUNT) {
-        throw new MoleculeException("Raw data should have " + FIELD_COUNT + " but find " + (offsets.length -1) + " offsets in header.");
-      }
-      byte[] itemBuf;
-      itemBuf = Arrays.copyOfRange(buf, offsets[0], offsets[1]);
-      header = Header.builder(itemBuf).build();
-      itemBuf = Arrays.copyOfRange(buf, offsets[1], offsets[2]);
-      proposals = ProposalShortIdVec.builder(itemBuf).build();
+    @Nonnull
+    public Header getHeader() {
+        return header;
     }
 
-    public Builder setHeader(@Nonnull Header header) {
-      Objects.requireNonNull(header);
-      this.header = header;
-      return this;
+    @Nonnull
+    public ProposalShortIdVec getProposals() {
+        return proposals;
     }
 
-    public Builder setProposals(@Nonnull ProposalShortIdVec proposals) {
-      Objects.requireNonNull(proposals);
-      this.proposals = proposals;
-      return this;
+    public static Builder builder() {
+        return new Builder();
     }
 
-    public UncleBlock build() {
-      int[] offsets = new int[FIELD_COUNT];
-      offsets[0] = 4 + 4 * FIELD_COUNT;
-      offsets[1] = offsets[0] + proposals.getSize();
-      int[] fieldsSize = new int[FIELD_COUNT];
-      fieldsSize[0] = header.getSize();
-      fieldsSize[1] = proposals.getSize();
-      byte[][] fieldsBuf = new byte[FIELD_COUNT][];
-      fieldsBuf[0] = header.getRawData();
-      fieldsBuf[1] = proposals.getRawData();
-      int size = 4 + 4 * FIELD_COUNT;
-      for (int i = 0; i < FIELD_COUNT; i++) {
-        size += fieldsSize[i];
-      }
-      byte[] buf = new byte[size];;
-      MoleculeUtils.setSize(size, buf, 0);
-      int start = 4;
-      for (int i = 0; i < FIELD_COUNT; i++) {
-        MoleculeUtils.setSize(fieldsSize[i], buf, start);
-        start += 4;
-      }
-      for (int i = 0; i < FIELD_COUNT; i++) {
-        MoleculeUtils.setBytes(fieldsBuf[i], buf, offsets[i]);
-      }
-      UncleBlock t = new UncleBlock();
-      t.buf = buf;
-      t.header = header;
-      t.proposals = proposals;
-      return t;
+    public static Builder builder(@Nonnull byte[] buf) {
+        return new Builder(buf);
     }
-  }
+
+    public static final class Builder {
+        private Header header;
+
+        private ProposalShortIdVec proposals;
+
+        private Builder() {
+            header = Header.builder().build();
+            proposals = ProposalShortIdVec.builder().build();
+        }
+
+        private Builder(@Nonnull byte[] buf) {
+            Objects.requireNonNull(buf);
+            int size = MoleculeUtils.littleEndianBytes4ToInt(buf, 0);
+            if (buf.length != size) {
+                throw new MoleculeException(size, buf.length, UncleBlock.class);
+            }
+            int[] offsets = MoleculeUtils.getOffsets(buf);
+            if (offsets.length - 1 != FIELD_COUNT) {
+                throw new MoleculeException("Raw data should have " + FIELD_COUNT + " but find " + (offsets.length -1) + " offsets in header.");
+            }
+            byte[] itemBuf;
+            itemBuf = Arrays.copyOfRange(buf, offsets[0], offsets[1]);
+            header = Header.builder(itemBuf).build();
+            itemBuf = Arrays.copyOfRange(buf, offsets[1], offsets[2]);
+            proposals = ProposalShortIdVec.builder(itemBuf).build();
+        }
+
+        public Builder setHeader(@Nonnull Header header) {
+            Objects.requireNonNull(header);
+            this.header = header;
+            return this;
+        }
+
+        public Builder setProposals(@Nonnull ProposalShortIdVec proposals) {
+            Objects.requireNonNull(proposals);
+            this.proposals = proposals;
+            return this;
+        }
+
+        public UncleBlock build() {
+            int[] offsets = new int[FIELD_COUNT];
+            offsets[0] = 4 + 4 * FIELD_COUNT;
+            offsets[1] = offsets[0] + header.getSize();
+            int[] fieldsSize = new int[FIELD_COUNT];
+            fieldsSize[0] = header.getSize();
+            fieldsSize[1] = proposals.getSize();
+            byte[][] fieldsBuf = new byte[FIELD_COUNT][];
+            fieldsBuf[0] = header.getRawData();
+            fieldsBuf[1] = proposals.getRawData();
+            int size = 4 + 4 * FIELD_COUNT;
+            for (int i = 0; i < FIELD_COUNT; i++) {
+                size += fieldsSize[i];
+            }
+            byte[] buf = new byte[size];;
+            MoleculeUtils.setSize(size, buf, 0);
+            int start = 4;
+            for (int i = 0; i < FIELD_COUNT; i++) {
+                MoleculeUtils.setSize(fieldsSize[i], buf, start);
+                start += 4;
+            }
+            for (int i = 0; i < FIELD_COUNT; i++) {
+                MoleculeUtils.setBytes(fieldsBuf[i], buf, offsets[i]);
+            }
+            UncleBlock t = new UncleBlock();
+            t.buf = buf;
+            t.header = header;
+            t.proposals = proposals;
+            return t;
+        }
+    }
 }
