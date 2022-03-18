@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import static org.nervos.molecule.MoleculeType.STRUCT;
 
@@ -90,13 +91,20 @@ public class MoleculeResolver {
                 case TABLE:
                 case STRUCT:
                     i++;
-                    while (i < lines.length && !"}".equals(lines[i])) {
+                    while (i < lines.length && !Objects.equals("}", lines[i])) {
                         String[] fieldToken = lines[i].split(" ");
                         builder.addFieldPlaceholder(fieldToken[0], fieldToken[1]);
                         i++;
                     }
                     if (moleculeType == STRUCT) {
                         builder.setSize(Integer.MAX_VALUE);
+                    }
+                    break;
+                case UNION:
+                    i++;
+                    while (i < lines.length && !Objects.equals("}", lines[i])) {
+                        builder.addFieldPlaceholder("innerType", lines[i].trim());
+                        i++;
                     }
                     break;
                 default:
@@ -147,11 +155,8 @@ public class MoleculeResolver {
                     resolveSize(fieldTypeDescriptor, isResolved);
                     if (!fieldTypeDescriptor.isFixedType()) {
                         throw new RuntimeException(
-                                "Struct can only have fixed type as field. [struct: "
-                                        + typeDescriptor.getName()
-                                        + ", field: "
-                                        + fieldTypeDescriptor.getName()
-                                        + "]");
+                                String.format("Struct can only have fixed type as field. [struct: %s, field: %s]",
+                                        typeDescriptor.getName(), fieldTypeDescriptor.getName()));
                     }
                     if (fieldTypeDescriptor.getSize() == -1) {
                         throw new RuntimeException(
@@ -163,16 +168,10 @@ public class MoleculeResolver {
                 break;
             case TABLE:
             case OPTION:
+            case VECTOR:
+            case UNION:
                 typeDescriptor.setSize(-1);
                 break;
-            case VECTOR:
-                fieldTypeDescriptor = typeDescriptor.getFields().get(0).getTypeDescriptor();
-                resolveSize(fieldTypeDescriptor, isResolved);
-                if (fieldTypeDescriptor.isFixedType()) {
-                    typeDescriptor.setSize(1);
-                } else {
-                    typeDescriptor.setSize(-1);
-                }
             case BYTE:
                 break;
             default:
