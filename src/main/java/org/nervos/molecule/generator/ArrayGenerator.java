@@ -111,7 +111,7 @@ public class ArrayGenerator extends AbstractConcreteGenerator {
         }
 
         MethodSpec.Builder constructorBufBuilder = constructorBufBuilder()
-                .beginControlFlow("if (buf.length >= $N)", size)
+                .beginControlFlow("if (buf.length != $N)", size)
                 .addStatement(
                         "throw new $T($N, buf.length, $T.class)",
                         base.classNameMoleculeException,

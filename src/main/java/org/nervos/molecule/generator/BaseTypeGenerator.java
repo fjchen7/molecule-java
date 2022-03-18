@@ -225,6 +225,13 @@ public class BaseTypeGenerator extends AbstractGenerator {
             .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
             .returns(int[].class)
             .addParameter(byte[].class, "buf")
+            .beginControlFlow("if (buf.length < 4)")
+            .addStatement("throw new $T(\"Byte length is less than 4.\")",
+                        this.classNameMoleculeException)
+            .endControlFlow()
+            .beginControlFlow("if (buf.length == 4)")
+            .addStatement("return new int[]{4}")
+            .endControlFlow()
             .addStatement("int headerEnd = $N(buf, 4)", littleEndianBytes4ToInt)
             .beginControlFlow("if (headerEnd % 4 != 0)")
             .addStatement(

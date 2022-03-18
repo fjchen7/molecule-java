@@ -133,19 +133,19 @@ public class TableGenerator extends AbstractConcreteGenerator {
     buildBuilder
         .addStatement("int[] offsets = new int[$N]", fieldCount)
         .addStatement("offsets[0] = 4 + 4 * $N", fieldCount);
-    for (int i = 1; i < fields.size(); i++) {
+    for (int i = 0; i < fields.size() - 1; i++) {
       FieldSpec field = fields.get(i);
       if (field.type == TypeName.BYTE) {
-        buildBuilder.addStatement("offsets[$L] = offsets[$L] + 1", i, i - 1);
+        buildBuilder.addStatement("offsets[$L] = offsets[$L] + 1", i + 1, i);
       } else {
         if (!isOption.get(i)) {
           buildBuilder.addStatement(
-              "offsets[$L] = offsets[$L] + $N.getSize()", i, i - 1, field.name);
+              "offsets[$L] = offsets[$L] + $N.getSize()", i + 1, i, field.name);
         } else {
           buildBuilder.addStatement(
               "offsets[$L] = offsets[$L] + ($L == null ? 0 : $L.getSize())",
+              i + 1,
               i,
-              i - 1,
               field.name,
               field.name);
         }
