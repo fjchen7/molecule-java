@@ -5,6 +5,7 @@ import org.nervos.molecule.descriptor.TypeDescriptor;
 
 import javax.annotation.Nonnull;
 import javax.lang.model.element.Modifier;
+import java.util.Arrays;
 import java.util.Objects;
 
 public class ArrayGenerator extends AbstractConcreteGenerator {
@@ -118,7 +119,7 @@ public class ArrayGenerator extends AbstractConcreteGenerator {
         if (itemTypeName != TypeName.BYTE) {
             constructorBufBuilder
                     .beginControlFlow("for (int i = 0; i < $N; i++)", itemCount)
-                    .addStatement("byte[] itemBuf = Arrays.copyOfRange(buf, i * $N, (i + 1) * $N)", itemSize, itemSize)
+                    .addStatement("byte[] itemBuf = $T.copyOfRange(buf, i * $N, (i + 1) * $N)", Arrays.class, itemSize, itemSize)
                     .addStatement("items[i] = $T.builder(itemBuf).build()", itemTypeName)
                     .endControlFlow();
         } else {
@@ -148,7 +149,7 @@ public class ArrayGenerator extends AbstractConcreteGenerator {
                     .beginControlFlow("for (int i = 0; i < $N; i++)", itemCount)
                     .addStatement("$T.setBytes($N[i].getRawData(), buf, i * $N)", base.classNameMoleculeUtils, items, itemSize)
                     .endControlFlow()
-                    .addStatement("$T a = new $T()", itemTypeName, itemTypeName)
+                    .addStatement("$T a = new $T()", name, name)
                     .addStatement("a.buf = buf");
         }
         buildBuilder.addStatement("a.items = items").addStatement("return a");
