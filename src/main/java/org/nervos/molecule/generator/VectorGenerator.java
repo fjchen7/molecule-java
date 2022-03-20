@@ -33,9 +33,6 @@ public abstract class VectorGenerator extends AbstractConcreteGenerator {
                 .returns(itemTypeName)
                 .addAnnotation(isItemOption ? Nullable.class : Nonnull.class)
                 .addParameter(int.class, "i")
-                .beginControlFlow("if (i >= $N.length)", items)
-                .addStatement("throw new $T(\"Index out of range: \" + $N.length)", IndexOutOfBoundsException.class, items)
-                .endControlFlow()
                 .addStatement("return $N[i]", items)
                 .build();
 
@@ -103,9 +100,6 @@ public abstract class VectorGenerator extends AbstractConcreteGenerator {
                             .build());
         }
         MethodSpec methodSet = methodSetBuilder
-                .beginControlFlow("if (i >= items.length)")
-                .addStatement("throw new $T(\"Index out of range: \" + items.length)", IndexOutOfBoundsException.class)
-                .endControlFlow()
                 .addStatement("items[i] = item")
                 .addStatement("return this")
                 .build();
@@ -114,8 +108,8 @@ public abstract class VectorGenerator extends AbstractConcreteGenerator {
                 .addModifiers(Modifier.PUBLIC)
                 .returns(builderName)
                 .addParameter(int.class, "i")
-                .beginControlFlow("if (i >= items.length)")
-                .addStatement("throw new $T(\"Index out of range: \" + items.length)", IndexOutOfBoundsException.class)
+                .beginControlFlow("if (i < 0 || i >= items.length)")
+                .addStatement("throw new $T(i)", ArrayIndexOutOfBoundsException.class)
                 .endControlFlow()
                 .addStatement("$T[] tempItems = new $T[items.length - 1]", itemTypeName, itemTypeName)
                 .addStatement("$T.arraycopy(items, 0, tempItems, 0, i)", System.class)

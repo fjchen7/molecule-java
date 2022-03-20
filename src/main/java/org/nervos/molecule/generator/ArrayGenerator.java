@@ -57,9 +57,6 @@ public class ArrayGenerator extends AbstractConcreteGenerator {
                 .returns(itemTypeName)
                 .addAnnotation(Nonnull.class)
                 .addParameter(int.class, "i")
-                .beginControlFlow("if (i >= $N)", itemCount)
-                .addStatement("throw new $T(\"Index out of range: \" + $N)", IndexOutOfBoundsException.class, itemCount)
-                .endControlFlow()
                 .addStatement("return $N[i]", items)
                 .build();
 
