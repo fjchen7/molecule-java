@@ -17,17 +17,17 @@ public abstract class AbstractConcreteGenerator extends AbstractGenerator {
     protected TypeSpec.Builder typeBuilder;
     protected TypeSpec.Builder typeBuilderBuilder;
 
-    protected ClassName className;
-    protected ClassName builderClassName;
+    protected TypeName name;
+    protected TypeName builderName;
 
-    protected ClassName baseTypeClassName;
+    protected TypeName superClassName;
 
     public AbstractConcreteGenerator(BaseTypeGenerator base, TypeDescriptor descriptor, String packageName) {
         this.base = base;
         this.descriptor = descriptor;
         this.packageName = packageName;
-        className = ClassName.get("", descriptor.getName());
-        builderClassName = ClassName.get("", "Builder");
+        name = ClassName.get("", descriptor.getName());
+        builderName = ClassName.get("", "Builder");
     }
 
     @Override
@@ -36,11 +36,11 @@ public abstract class AbstractConcreteGenerator extends AbstractGenerator {
     }
 
     protected TypeSpec generate() {
-        typeBuilder = TypeSpec.classBuilder(className.canonicalName())
+        typeBuilder = TypeSpec.classBuilder(descriptor.getName())
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
-                .superclass(baseTypeClassName)
+                .superclass(superClassName)
                 .addMethod(constructorBuilder().build());
-        typeBuilderBuilder = TypeSpec.classBuilder(builderClassName.canonicalName())
+        typeBuilderBuilder = TypeSpec.classBuilder("Builder")
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL);
 
         fillType();
@@ -48,15 +48,15 @@ public abstract class AbstractConcreteGenerator extends AbstractGenerator {
         typeBuilder
                 .addMethod(MethodSpec.methodBuilder("builder")
                         .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                        .returns(builderClassName)
-                        .addStatement("return new $T()", builderClassName)
+                        .returns(builderName)
+                        .addStatement("return new $T()", builderName)
                         .build())
                 .addMethod(MethodSpec.methodBuilder("builder")
                         .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                        .returns(builderClassName)
+                        .returns(builderName)
                         .addParameter(ParameterSpec.builder(byte[].class, "buf")
                                 .addAnnotation(Nonnull.class).build())
-                        .addStatement("return new $T(buf)", builderClassName)
+                        .addStatement("return new $T(buf)", builderName)
                         .build());
 
         fillTypeBuilder();
@@ -76,13 +76,9 @@ public abstract class AbstractConcreteGenerator extends AbstractGenerator {
         }
     }
 
-    protected boolean isByte(TypeDescriptor descriptor) {
-        return descriptor == TypeDescriptor.BYTE_TYPE_DESCRIPTOR;
-    }
-
     protected MethodSpec.Builder methodBuildBuilder() {
         return MethodSpec.methodBuilder("build")
-                .addModifiers(Modifier.PUBLIC).returns(className);
+                .addModifiers(Modifier.PUBLIC).returns(name);
     }
 
     protected MethodSpec.Builder constructorBuilder() {

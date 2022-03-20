@@ -18,7 +18,7 @@ public class ArrayGenerator extends AbstractConcreteGenerator {
         super(base, descriptor, packageName);
         itemDescriptor = descriptor.getFields().get(0).getTypeDescriptor();
         itemTypeName = getTypeName(itemDescriptor);
-        baseTypeClassName = base.classNameArray;
+        superClassName = base.classNameArray;
     }
 
     @Override
@@ -112,7 +112,7 @@ public class ArrayGenerator extends AbstractConcreteGenerator {
 
         MethodSpec.Builder constructorBufBuilder = constructorBufBuilder()
                 .beginControlFlow("if (buf.length != $N)", size)
-                .addStatement("throw new $T($N, buf.length, $T.class)", base.classNameMoleculeException, size, className)
+                .addStatement("throw new $T($N, buf.length, $T.class)", base.classNameMoleculeException, size, name)
                 .endControlFlow();
 
         if (itemTypeName != TypeName.BYTE) {
@@ -127,7 +127,7 @@ public class ArrayGenerator extends AbstractConcreteGenerator {
 
         MethodSpec setItem = MethodSpec.methodBuilder("setItem")
                 .addModifiers(Modifier.PUBLIC)
-                .returns(builderClassName)
+                .returns(builderName)
                 .addParameter(int.class, "i")
                 .addParameter(ParameterSpec.builder(itemTypeName, "item")
                         .addAnnotation(Nonnull.class).build())
@@ -140,7 +140,7 @@ public class ArrayGenerator extends AbstractConcreteGenerator {
 
         if (itemTypeName == TypeName.BYTE) {
             buildBuilder
-                    .addStatement("$T a = new $T()", className, className)
+                    .addStatement("$T a = new $T()", name, name)
                     .addStatement("a.buf = items");
         } else {
             buildBuilder

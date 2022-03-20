@@ -23,7 +23,7 @@ public class TableGenerator extends AbstractConcreteGenerator {
 
     public TableGenerator(BaseTypeGenerator base, TypeDescriptor descriptor, String packageName) {
         super(base, descriptor, packageName);
-        baseTypeClassName = base.classNameTable;
+        superClassName = base.classNameTable;
         for (FieldDescriptor fieldDescriptor : descriptor.getFields()) {
             String fieldName = snakeCaseToCamelCase(fieldDescriptor.getName());
             TypeName fieldTypeName = getTypeName(fieldDescriptor.getTypeDescriptor());
@@ -60,7 +60,7 @@ public class TableGenerator extends AbstractConcreteGenerator {
         MethodSpec.Builder constructorBufBuilder = constructorBufBuilder()
                 .addStatement("int size = $T.littleEndianBytes4ToInt(buf, 0)", base.classNameMoleculeUtils)
                 .beginControlFlow("if (buf.length != size)")
-                .addStatement("throw new $T(size, buf.length, $T.class)", base.classNameMoleculeException, className)
+                .addStatement("throw new $T(size, buf.length, $T.class)", base.classNameMoleculeException, name)
                 .endControlFlow()
                 .addStatement("int[] offsets = $T.getOffsets(buf)", base.classNameMoleculeUtils)
                 .beginControlFlow("if (offsets.length - 1 != $N)", fieldCount)
@@ -98,7 +98,7 @@ public class TableGenerator extends AbstractConcreteGenerator {
             FieldSpec field = fields.get(i);
             MethodSpec.Builder setterBuilder = MethodSpec.methodBuilder("set" + upperFirstChar(field.name))
                     .addModifiers(Modifier.PUBLIC)
-                    .returns(builderClassName);
+                    .returns(builderName);
 
             if (!isOption.get(i)) {
                 setterBuilder
@@ -184,7 +184,7 @@ public class TableGenerator extends AbstractConcreteGenerator {
                 .addStatement("$T.setBytes(fieldsBuf[i], buf, offsets[i])", base.classNameMoleculeUtils)
                 .endControlFlow();
 
-        buildBuilder.addStatement("$T t = new $T()", className, className).addStatement("t.buf = buf");
+        buildBuilder.addStatement("$T t = new $T()", name, name).addStatement("t.buf = buf");
         for (FieldSpec field : fields) {
             buildBuilder.addStatement("t.$L = $L", field.name, field.name);
         }

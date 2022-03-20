@@ -10,7 +10,7 @@ public class DynamicVectorGenerator extends VectorGenerator {
     public DynamicVectorGenerator(
             BaseTypeGenerator base, TypeDescriptor descriptor, String packageName) {
         super(base, descriptor, packageName);
-        baseTypeClassName = base.classNameDynamicVector;
+        superClassName = base.classNameDynamicVector;
         isItemOption = itemDescriptor.getMoleculeType() == MoleculeType.OPTION;
     }
 
@@ -27,7 +27,7 @@ public class DynamicVectorGenerator extends VectorGenerator {
         MethodSpec.Builder constructorBufBuilder = constructorBufBuilder()
                 .addStatement("int size = $T.littleEndianBytes4ToInt(buf, 0)", base.classNameMoleculeUtils)
                 .beginControlFlow("if (buf.length != size)")
-                .addStatement("throw new $T(size, buf.length, $T.class)", base.classNameMoleculeException, className)
+                .addStatement("throw new $T(size, buf.length, $T.class)", base.classNameMoleculeException, name)
                 .endControlFlow();
 
         constructorBufBuilder
@@ -80,7 +80,7 @@ public class DynamicVectorGenerator extends VectorGenerator {
                 .endControlFlow();
 
         buildBuilder
-                .addStatement("$T v = new $T()", className, className)
+                .addStatement("$T v = new $T()", name, name)
                 .addStatement("v.buf = buf")
                 .addStatement("v.items = items")
                 .addStatement("return v");

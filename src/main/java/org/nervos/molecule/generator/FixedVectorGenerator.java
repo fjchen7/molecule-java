@@ -14,7 +14,7 @@ public class FixedVectorGenerator extends VectorGenerator {
     public FixedVectorGenerator(
             BaseTypeGenerator base, TypeDescriptor descriptor, String packageName) {
         super(base, descriptor, packageName);
-        baseTypeClassName = base.classNameFixedVector;
+        superClassName = base.classNameFixedVector;
 
         isItemOption = false;
     }
@@ -42,7 +42,7 @@ public class FixedVectorGenerator extends VectorGenerator {
                 .addStatement("int itemCount = $T.littleEndianBytes4ToInt(buf, 0)", base.classNameMoleculeUtils)
                 .addStatement("int size = 4 + itemCount * $N", itemSize)
                 .beginControlFlow("if (buf.length != size)")
-                .addStatement("throw new $T(size, buf.length, $T.class)", base.classNameMoleculeException, className)
+                .addStatement("throw new $T(size, buf.length, $T.class)", base.classNameMoleculeException, name)
                 .endControlFlow();
         if (itemTypeName != TypeName.BYTE) {
             constructorBufBuilder
@@ -80,7 +80,7 @@ public class FixedVectorGenerator extends VectorGenerator {
         }
 
         buildBuilder
-                .addStatement("$T v = new $T()", className, className)
+                .addStatement("$T v = new $T()", name, name)
                 .addStatement("v.buf = buf")
                 .addStatement("v.items = items")
                 .addStatement("return v");

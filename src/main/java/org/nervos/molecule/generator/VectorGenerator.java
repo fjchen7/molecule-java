@@ -67,7 +67,7 @@ public abstract class VectorGenerator extends AbstractConcreteGenerator {
         fillTypeBuilderConstructor();
 
         MethodSpec.Builder methodAddBuilder = MethodSpec.methodBuilder("add")
-                .addModifiers(Modifier.PUBLIC).returns(builderClassName);
+                .addModifiers(Modifier.PUBLIC).returns(builderName);
         if (!isItemOption) {
             methodAddBuilder
                     .addParameter(ParameterSpec.builder(itemTypeName, "item")
@@ -86,7 +86,7 @@ public abstract class VectorGenerator extends AbstractConcreteGenerator {
 
         MethodSpec.Builder methodSetBuilder = MethodSpec.methodBuilder("set")
                 .addModifiers(Modifier.PUBLIC)
-                .returns(builderClassName)
+                .returns(builderName)
                 .addParameter(int.class, "i");
         if (!isItemOption) {
             methodSetBuilder
@@ -106,7 +106,7 @@ public abstract class VectorGenerator extends AbstractConcreteGenerator {
 
         MethodSpec methodRemove = MethodSpec.methodBuilder("remove")
                 .addModifiers(Modifier.PUBLIC)
-                .returns(builderClassName)
+                .returns(builderName)
                 .addParameter(int.class, "i")
                 .beginControlFlow("if (i >= items.length)")
                 .addStatement("throw new $T(\"Index out of range: \" + items.length)", IndexOutOfBoundsException.class)

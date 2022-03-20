@@ -21,7 +21,7 @@ public class StructGenerator extends AbstractConcreteGenerator {
 
     public StructGenerator(BaseTypeGenerator base, TypeDescriptor descriptor, String packageName) {
         super(base, descriptor, packageName);
-        baseTypeClassName = base.classNameStruct;
+        superClassName = base.classNameStruct;
 
         for (FieldDescriptor fieldDescriptor : descriptor.getFields()) {
             String fieldName = snakeCaseToCamelCase(fieldDescriptor.getName());
@@ -61,7 +61,7 @@ public class StructGenerator extends AbstractConcreteGenerator {
         MethodSpec.Builder constructorBufBuilder = constructorBufBuilder()
                 .beginControlFlow("if (buf.length != $N)", size)
                 .addStatement("throw new $T($N, buf.length, $T.class)",
-                        base.classNameMoleculeException, size, className)
+                        base.classNameMoleculeException, size, name)
                 .endControlFlow()
                 .addStatement("byte[] itemBuf");
 
@@ -87,7 +87,7 @@ public class StructGenerator extends AbstractConcreteGenerator {
         for (FieldSpec field : fields) {
             MethodSpec setter = MethodSpec.methodBuilder("set" + upperFirstChar(field.name))
                     .addModifiers(Modifier.PUBLIC)
-                    .returns(builderClassName)
+                    .returns(builderName)
                     .addParameter(ParameterSpec.builder(field.type, field.name)
                             .addAnnotation(Nonnull.class)
                             .build())
@@ -119,7 +119,7 @@ public class StructGenerator extends AbstractConcreteGenerator {
                         base.classNameMoleculeUtils, field.name, i);
             }
         }
-        buildBuilder.addStatement("$T s = new $T()", className, className).addStatement("s.buf = buf");
+        buildBuilder.addStatement("$T s = new $T()", name, name).addStatement("s.buf = buf");
         for (FieldSpec field : fields) {
             buildBuilder.addStatement("s.$L = $L", field.name, field.name);
         }
