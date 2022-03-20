@@ -65,14 +65,16 @@ public abstract class AbstractConcreteGenerator extends AbstractGenerator {
     }
 
     protected TypeName getTypeName(TypeDescriptor descriptor) {
-        if (descriptor == TypeDescriptor.BYTE_TYPE_DESCRIPTOR) {
-            return TypeName.BYTE;
+        boolean isOption = descriptor.getMoleculeType() == MoleculeType.OPTION;
+
+        while (descriptor.getMoleculeType() == MoleculeType.OPTION) {
+            descriptor = descriptor.getFields().get(0).getTypeDescriptor();
         }
-        if (descriptor.getMoleculeType() != MoleculeType.OPTION) {
-            return ClassName.get("", descriptor.getName());
+
+        if (descriptor == TypeDescriptor.BYTE_TYPE_DESCRIPTOR) {
+            return isOption ? TypeName.BYTE.box() : TypeName.BYTE;
         } else {
-            TypeDescriptor innerTypeDescriptor = descriptor.getFields().get(0).getTypeDescriptor();
-            return ClassName.get("", innerTypeDescriptor.getName());
+            return ClassName.get("", descriptor.getName());
         }
     }
 
