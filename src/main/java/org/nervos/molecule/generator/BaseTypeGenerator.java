@@ -1,9 +1,6 @@
 package org.nervos.molecule.generator;
 
-import com.squareup.javapoet.ClassName;
-import com.squareup.javapoet.FieldSpec;
-import com.squareup.javapoet.MethodSpec;
-import com.squareup.javapoet.TypeSpec;
+import com.squareup.javapoet.*;
 
 import javax.lang.model.element.Modifier;
 import java.io.IOException;
@@ -20,6 +17,8 @@ public class BaseTypeGenerator extends AbstractGenerator {
     public ClassName classNameVector;
     public ClassName classNameDynamicVector;
     public ClassName classNameFixedVector;
+    public ClassName classNameUnion;
+    public ClassName classNameOption;
     public ClassName classNameMoleculeException;
     public ClassName classNameMoleculeUtils;
 
@@ -44,6 +43,8 @@ public class BaseTypeGenerator extends AbstractGenerator {
         typeSpecs.add(generateBaseDynamicVector());
         typeSpecs.add(generateBaseFixedVector());
         typeSpecs.add(generateBaseTable());
+        typeSpecs.add(generateBaseUnion());
+        typeSpecs.add(generateBaseOption());
         typeSpecs.add(generateMoleculeException());
         typeSpecs.add(generateMoleculeUtils());
         return typeSpecs;
@@ -143,6 +144,53 @@ public class BaseTypeGenerator extends AbstractGenerator {
         return fixedVector;
     }
 
+    private TypeSpec generateBaseUnion() {
+        TypeSpec union = TypeSpec.classBuilder("Union")
+                .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
+                .superclass(classNameMolecule)
+                .addField(FieldSpec.builder(int.class, "typeId")
+                        .addModifiers(Modifier.PROTECTED).build())
+                .addField(FieldSpec.builder(Object.class, "item")
+                        .addModifiers(Modifier.PROTECTED).build())
+                .addMethod(MethodSpec.methodBuilder("getTypeId")
+                        .addModifiers(Modifier.PUBLIC)
+                        .returns(int.class)
+                        .addStatement("return this.typeId")
+                        .build())
+                .addMethod(MethodSpec.methodBuilder("getItem")
+                        .addModifiers(Modifier.PUBLIC)
+                        .returns(Object.class)
+                        .addStatement("return this.item")
+                        .build())
+                .build();
+        classNameUnion = ClassName.get(packageName, union.name);
+        return union;
+    }
+
+    private TypeSpec generateBaseOption() {
+        TypeVariableName t = TypeVariableName.get("T");
+        TypeSpec option = TypeSpec.classBuilder("Option")
+                .addTypeVariable(t)
+                .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
+                .superclass(classNameMolecule)
+                .addField(FieldSpec.builder(t, "item")
+                        .addModifiers(Modifier.PROTECTED)
+                        .build())
+                .addMethod(MethodSpec.methodBuilder("isNull")
+                        .addModifiers(Modifier.PUBLIC)
+                        .returns(boolean.class)
+                        .addStatement("return item == null")
+                        .build())
+                .addMethod(MethodSpec.methodBuilder("getItem")
+                        .addModifiers(Modifier.PUBLIC)
+                        .returns(t)
+                        .addStatement("return item")
+                        .build())
+                .build();
+        classNameOption = ClassName.get(packageName, option.name);
+        return option;
+    }
+
     public TypeSpec generateMoleculeException() {
         TypeSpec moleculeException = TypeSpec.classBuilder("MoleculeException")
                 .addModifiers(Modifier.PUBLIC)
@@ -160,6 +208,11 @@ public class BaseTypeGenerator extends AbstractGenerator {
                         .addStatement("super(String.format(\n"
                                 + "\"Expect %d-byte but receive %d-byte raw data for molecule class %s.\",\n"
                                 + "expectedLength, actualLength, clazz.getSimpleName()))")
+                        .build())
+                .addMethod(MethodSpec.constructorBuilder()
+                        .addModifiers(Modifier.PUBLIC)
+                        .addParameter(Throwable.class, "cause")
+                        .addStatement("super(cause)")
                         .build())
                 .build();
         classNameMoleculeException = ClassName.get(packageName, moleculeException.name);
