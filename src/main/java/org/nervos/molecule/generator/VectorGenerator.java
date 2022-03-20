@@ -74,7 +74,10 @@ public abstract class VectorGenerator extends AbstractConcreteGenerator {
                             .addAnnotation(Nonnull.class).build())
                     .addStatement("$T.requireNonNull(item)", Objects.class);
         } else {
-            methodAddBuilder.addParameter(itemTypeName, "item");
+            methodAddBuilder.addParameter(
+                    ParameterSpec.builder(itemTypeName, "item")
+                            .addAnnotation(Nullable.class)
+                            .build());
         }
         methodAddBuilder
                 .addStatement("$T[] tempItems = new $T[items.length + 1]", itemTypeName, itemTypeName)
@@ -94,7 +97,10 @@ public abstract class VectorGenerator extends AbstractConcreteGenerator {
                             .addAnnotation(Nonnull.class).build())
                     .addStatement("$T.requireNonNull(item)", Objects.class);
         } else {
-            methodSetBuilder.addParameter(itemTypeName, "item");
+            methodSetBuilder.addParameter(
+                    ParameterSpec.builder(itemTypeName, "item")
+                            .addAnnotation(Nullable.class)
+                            .build());
         }
         MethodSpec methodSet = methodSetBuilder
                 .beginControlFlow("if (i >= items.length)")

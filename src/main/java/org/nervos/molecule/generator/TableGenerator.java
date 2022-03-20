@@ -74,6 +74,11 @@ public class TableGenerator extends AbstractConcreteGenerator {
             typeBuilderBuilder.addField(field);
             if (field.type == TypeName.BYTE) {
                 constructorBufBuilder.addStatement("$L = buf[offsets[$L]]", field.name, i);
+            } else if (field.type == TypeName.BYTE.box()) {
+                constructorBufBuilder
+                        .beginControlFlow("if (offsets[$L] != offsets[$L])", i, i + 1)
+                        .addStatement("$L = buf[offsets[$L]]", field.name, i)
+                        .endControlFlow();
             } else {
                 if (!isOption.get(i)) {
                     constructorBuilder.addStatement("$L = $T.builder().build()", field.name, field.type);
@@ -125,6 +130,8 @@ public class TableGenerator extends AbstractConcreteGenerator {
             FieldSpec field = fields.get(i);
             if (field.type == TypeName.BYTE) {
                 buildBuilder.addStatement("offsets[$L] = offsets[$L] + 1", i + 1, i);
+            } else if (field.type == TypeName.BYTE.box()) {
+                buildBuilder.addStatement("offsets[$L] = offsets[$L] + ($L == null ? 0 : 1)", i + 1, i, field.name);
             } else {
                 if (!isOption.get(i)) {
                     buildBuilder.addStatement("offsets[$L] = offsets[$L] + $N.getSize()", i + 1, i, field.name);
@@ -140,6 +147,8 @@ public class TableGenerator extends AbstractConcreteGenerator {
             FieldSpec field = fields.get(i);
             if (field.type == TypeName.BYTE) {
                 buildBuilder.addStatement("fieldsSize[$L] = 1", i);
+            } else if (field.type == TypeName.BYTE.box()) {
+                buildBuilder.addStatement("fieldsSize[$L] = ($L == null ? 0 : 1)", i, field.name);
             } else {
                 if (!isOption.get(i)) {
                     buildBuilder.addStatement("fieldsSize[$L] = $L.getSize()", i, field.name);
@@ -154,6 +163,8 @@ public class TableGenerator extends AbstractConcreteGenerator {
             FieldSpec field = fields.get(i);
             if (field.type == TypeName.BYTE) {
                 buildBuilder.addStatement("fieldsBuf[$L] = new byte[]{$L}", i, field.name);
+            } else if (field.type == TypeName.BYTE.box()) {
+                buildBuilder.addStatement("fieldsBuf[$L] = ($L == null ? new byte[]{} : new byte[]{$L})", i, field.name, field.name);
             } else {
                 if (!isOption.get(i)) {
                     buildBuilder.addStatement("fieldsBuf[$L] = $L.getRawData()", i, field.name);
