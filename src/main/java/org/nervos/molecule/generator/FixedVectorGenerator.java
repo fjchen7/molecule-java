@@ -29,7 +29,21 @@ public class FixedVectorGenerator extends VectorGenerator {
             itemSizeBuilder.initializer("$T.SIZE", itemTypeName);
         }
         itemSize = itemSizeBuilder.build();
-        typeBuilder.addField(itemSize);
+//
+//        MethodSpec methodGetItemSize = MethodSpec.methodBuilder("getItemSize")
+//                .addModifiers(Modifier.PUBLIC)
+//                .returns(int.class)
+//                .addAnnotation(Override.class)
+//                .addStatement("return $N", itemSize)
+//                .build();
+
+        typeBuilder.addField(itemSize)
+                .addMethod(MethodSpec.methodBuilder("getItemSize")
+                        .addModifiers(Modifier.PUBLIC)
+                        .returns(int.class)
+                        .addAnnotation(Override.class)
+                        .addStatement("return $N", itemSize)
+                        .build());
         super.fillType();
     }
 

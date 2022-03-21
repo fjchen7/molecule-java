@@ -139,6 +139,10 @@ public class BaseTypeGenerator extends AbstractGenerator {
         TypeSpec fixedVector = TypeSpec.classBuilder("FixedVector")
                 .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
                 .superclass(classNameVector)
+                .addMethod(MethodSpec.methodBuilder("getItemSize")
+                        .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
+                        .returns(int.class)
+                        .build())
                 .build();
         classNameFixedVector = ClassName.get(packageName, fixedVector.name);
         return fixedVector;
