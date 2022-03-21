@@ -182,7 +182,7 @@ public class UnionGenerator extends AbstractConcreteGenerator {
                 .addStatement("buf = new byte[4 + molecule.getSize()]")
                 .addStatement("$T.setBytes(molecule.getRawData(), buf, 4)", base.classNameMoleculeUtils)
                 .endControlFlow()
-                .addStatement("$T.setSize(typeId, buf, 0)", base.classNameMoleculeUtils);
+                .addStatement("$T.setInt(typeId, buf, 0)", base.classNameMoleculeUtils);
 
         buildBuilder
                 .addStatement("$T u  = new $T()", name, name)

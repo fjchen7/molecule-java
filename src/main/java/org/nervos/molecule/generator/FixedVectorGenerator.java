@@ -67,7 +67,7 @@ public class FixedVectorGenerator extends VectorGenerator {
     void fillTypeBuilderMethodBuild() {
         MethodSpec.Builder buildBuilder = methodBuildBuilder()
                 .addStatement("byte[] buf = new byte[4 + items.length * $N]", itemSize)
-                .addStatement("$T.setSize(items.length, buf, 0);", base.classNameMoleculeUtils);
+                .addStatement("$T.setInt(items.length, buf, 0);", base.classNameMoleculeUtils);
         if (itemTypeName != TypeName.BYTE) {
             buildBuilder
                     .addStatement("int start = 4")

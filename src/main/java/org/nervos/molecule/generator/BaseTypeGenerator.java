@@ -228,7 +228,7 @@ public class BaseTypeGenerator extends AbstractGenerator {
                 .addStatement("$T.arraycopy(from, 0, to, start, from.length)", System.class)
                 .build();
 
-        MethodSpec setSize = MethodSpec.methodBuilder("setSize")
+        MethodSpec setInt = MethodSpec.methodBuilder("setInt")
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .addParameter(int.class, "size")
                 .addParameter(byte[].class, "to")
@@ -280,7 +280,7 @@ public class BaseTypeGenerator extends AbstractGenerator {
         TypeSpec moleculeUtils = TypeSpec.classBuilder("MoleculeUtils")
                 .addModifiers(Modifier.PUBLIC)
                 .addMethod(setBytes)
-                .addMethod(setSize)
+                .addMethod(setInt)
                 .addMethod(littleEndianBytes4ToInt)
                 .addMethod(getOffsets)
                 .build();

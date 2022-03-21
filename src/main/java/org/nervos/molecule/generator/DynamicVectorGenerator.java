@@ -82,13 +82,13 @@ public class DynamicVectorGenerator extends VectorGenerator {
 
         buildBuilder
                 .addStatement("byte[] buf = new byte[size]")
-                .addStatement("$T.setSize(size, buf, 0);", base.classNameMoleculeUtils);
+                .addStatement("$T.setInt(size, buf, 0);", base.classNameMoleculeUtils);
 
         buildBuilder
                 .addStatement("int offset = 4 + 4 * items.length")
                 .addStatement("int start = 4")
                 .beginControlFlow("for (int i = 0; i < items.length; i++)")
-                .addStatement("$T.setSize(offset, buf, start);", base.classNameMoleculeUtils);
+                .addStatement("$T.setInt(offset, buf, start);", base.classNameMoleculeUtils);
         if (isItemOption) {
             buildBuilder.beginControlFlow("if (items[i] != null)");
             if (isItemBoxByte) {

@@ -79,7 +79,7 @@ public class TableGenerator extends AbstractConcreteGenerator {
         MethodSpec.Builder buildBuilder = methodBuildBuilder()
                 .addStatement("int size = 4")
                 .addStatement("byte[] buf = new byte[size];")
-                .addStatement("$T.setSize(size, buf, 0)", base.classNameMoleculeUtils)
+                .addStatement("$T.setInt(size, buf, 0)", base.classNameMoleculeUtils)
                 .addStatement("$T t = new $T()", name, name)
                 .addStatement("t.buf = buf")
                 .addStatement("return t");
@@ -216,12 +216,12 @@ public class TableGenerator extends AbstractConcreteGenerator {
                 .addStatement("size += fieldsSize[i]")
                 .endControlFlow()
                 .addStatement("byte[] buf = new byte[size];")
-                .addStatement("$T.setSize(size, buf, 0)", base.classNameMoleculeUtils);
+                .addStatement("$T.setInt(size, buf, 0)", base.classNameMoleculeUtils);
 
         buildBuilder
                 .addStatement("int start = 4")
                 .beginControlFlow("for (int i = 0; i < $N; i++)", fieldCount)
-                .addStatement("$T.setSize(offsets[i], buf, start)", base.classNameMoleculeUtils)
+                .addStatement("$T.setInt(offsets[i], buf, start)", base.classNameMoleculeUtils)
                 .addStatement("start += 4")
                 .endControlFlow();
 
