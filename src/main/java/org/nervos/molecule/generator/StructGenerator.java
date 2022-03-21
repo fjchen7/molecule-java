@@ -62,9 +62,11 @@ public class StructGenerator extends AbstractConcreteGenerator {
                 .beginControlFlow("if (buf.length != $N)", size)
                 .addStatement("throw new $T($N, buf.length, $T.class)",
                         base.classNameMoleculeException, size, name)
-                .endControlFlow()
-                .addStatement("byte[] itemBuf");
+                .endControlFlow();
 
+        if (fields.size() > 0) {
+            constructorBufBuilder.addStatement("byte[] itemBuf");
+        }
         int start = 0;
         for (int i = 0; i < descriptor.getFields().size(); i++) {
             FieldSpec field = fields.get(i);
@@ -98,9 +100,12 @@ public class StructGenerator extends AbstractConcreteGenerator {
             typeBuilderBuilder.addMethod(setter);
         }
 
-        MethodSpec.Builder buildBuilder = methodBuildBuilder()
-                .addStatement("int[] offsets = new int[$N]", fieldCount)
-                .addStatement("offsets[0] = 0");
+        MethodSpec.Builder buildBuilder = methodBuildBuilder();
+        if (fields.size() > 0) {
+            buildBuilder
+                    .addStatement("int[] offsets = new int[$N]", fieldCount)
+                    .addStatement("offsets[0] = 0");
+        }
         for (int i = 1; i < descriptor.getFields().size(); i++) {
             FieldSpec field = fields.get(i - 1);
             if (field.type == TypeName.BYTE) {
@@ -119,7 +124,8 @@ public class StructGenerator extends AbstractConcreteGenerator {
                         base.classNameMoleculeUtils, field.name, i);
             }
         }
-        buildBuilder.addStatement("$T s = new $T()", name, name).addStatement("s.buf = buf");
+        buildBuilder.addStatement("$T s = new $T()", name, name)
+                .addStatement("s.buf = buf");
         for (FieldSpec field : fields) {
             buildBuilder.addStatement("s.$L = $L", field.name, field.name);
         }

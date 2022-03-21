@@ -56,6 +56,41 @@ public class TableGenerator extends AbstractConcreteGenerator {
 
     @Override
     protected void fillTypeBuilder() {
+        if (fields.size() > 0) {
+            fillNonEmptyTypeBuilder();
+        } else {
+            fillEmptyTypeBuilder();
+        }
+    }
+
+    private void fillEmptyTypeBuilder() {
+        MethodSpec.Builder constructorBuilder = constructorBuilder();
+        MethodSpec.Builder constructorBufBuilder = constructorBufBuilder()
+                .addStatement("int size = $T.littleEndianBytes4ToInt(buf, 0)", base.classNameMoleculeUtils)
+                .beginControlFlow("if (buf.length != size)")
+                .addStatement("throw new $T(size, buf.length, $T.class)", base.classNameMoleculeException, name)
+                .endControlFlow()
+                .addStatement("int[] offsets = $T.getOffsets(buf)", base.classNameMoleculeUtils)
+                .beginControlFlow("if (offsets.length - 1 != $N)", fieldCount)
+                .addStatement("throw new $T(\"Raw data should have \" + $N + \" but find \" + (offsets.length -1) + \" offsets in header.\")",
+                        base.classNameMoleculeException, fieldCount)
+                .endControlFlow();
+
+        MethodSpec.Builder buildBuilder = methodBuildBuilder()
+                .addStatement("int size = 4")
+                .addStatement("byte[] buf = new byte[size];")
+                .addStatement("$T.setSize(size, buf, 0)", base.classNameMoleculeUtils)
+                .addStatement("$T t = new $T()", name, name)
+                .addStatement("t.buf = buf")
+                .addStatement("return t");
+
+        typeBuilderBuilder
+                .addMethod(constructorBuilder.build())
+                .addMethod(constructorBufBuilder.build())
+                .addMethod(buildBuilder.build());
+    }
+
+    private void fillNonEmptyTypeBuilder() {
         MethodSpec.Builder constructorBuilder = constructorBuilder();
         MethodSpec.Builder constructorBufBuilder = constructorBufBuilder()
                 .addStatement("int size = $T.littleEndianBytes4ToInt(buf, 0)", base.classNameMoleculeUtils)
@@ -195,7 +230,9 @@ public class TableGenerator extends AbstractConcreteGenerator {
                 .addStatement("$T.setBytes(fieldsBuf[i], buf, offsets[i])", base.classNameMoleculeUtils)
                 .endControlFlow();
 
-        buildBuilder.addStatement("$T t = new $T()", name, name).addStatement("t.buf = buf");
+        buildBuilder
+                .addStatement("$T t = new $T()", name, name)
+                .addStatement("t.buf = buf");
         for (FieldSpec field : fields) {
             buildBuilder.addStatement("t.$L = $L", field.name, field.name);
         }
