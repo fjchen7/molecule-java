@@ -17,9 +17,6 @@ public final class BytesVec extends DynamicVector {
 
     @Nonnull
     public Bytes get(int i) {
-        if (i >= items.length) {
-            throw new IndexOutOfBoundsException("Index out of range: " + items.length);
-        }
         return items[i];
     }
 
@@ -73,16 +70,13 @@ public final class BytesVec extends DynamicVector {
 
         public Builder set(int i, @Nonnull Bytes item) {
             Objects.requireNonNull(item);
-            if (i >= items.length) {
-                throw new IndexOutOfBoundsException("Index out of range: " + items.length);
-            }
             items[i] = item;
             return this;
         }
 
         public Builder remove(int i) {
-            if (i >= items.length) {
-                throw new IndexOutOfBoundsException("Index out of range: " + items.length);
+            if (i < 0 || i >= items.length) {
+                throw new ArrayIndexOutOfBoundsException(i);
             }
             Bytes[] tempItems = new Bytes[items.length - 1];
             System.arraycopy(items, 0, tempItems, 0, i);
@@ -97,11 +91,11 @@ public final class BytesVec extends DynamicVector {
                 size += items[i].getSize();
             }
             byte[] buf = new byte[size];
-            MoleculeUtils.setSize(size, buf, 0);;
+            MoleculeUtils.setInt(size, buf, 0);;
             int offset = 4 + 4 * items.length;
             int start = 4;
             for (int i = 0; i < items.length; i++) {
-                MoleculeUtils.setSize(offset, buf, start);;
+                MoleculeUtils.setInt(offset, buf, start);;
                 offset += items[i].getSize();
                 start += 4;
             }

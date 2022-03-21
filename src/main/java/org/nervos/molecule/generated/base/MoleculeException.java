@@ -10,4 +10,8 @@ public class MoleculeException extends IllegalArgumentException {
                 "Expect %d-byte but receive %d-byte raw data for molecule class %s.",
                 expectedLength, actualLength, clazz.getSimpleName()));
     }
+
+    public MoleculeException(Throwable cause) {
+        super(cause);
+    }
 }

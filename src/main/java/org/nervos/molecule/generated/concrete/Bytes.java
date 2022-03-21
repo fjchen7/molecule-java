@@ -17,11 +17,13 @@ public final class Bytes extends FixedVector {
     private Bytes() {
     }
 
+    @Override
+    public int getItemSize() {
+        return ITEM_SIZE;
+    }
+
     @Nonnull
     public byte get(int i) {
-        if (i >= items.length) {
-            throw new IndexOutOfBoundsException("Index out of range: " + items.length);
-        }
         return items[i];
     }
 
@@ -71,16 +73,13 @@ public final class Bytes extends FixedVector {
 
         public Builder set(int i, @Nonnull byte item) {
             Objects.requireNonNull(item);
-            if (i >= items.length) {
-                throw new IndexOutOfBoundsException("Index out of range: " + items.length);
-            }
             items[i] = item;
             return this;
         }
 
         public Builder remove(int i) {
-            if (i >= items.length) {
-                throw new IndexOutOfBoundsException("Index out of range: " + items.length);
+            if (i < 0 || i >= items.length) {
+                throw new ArrayIndexOutOfBoundsException(i);
             }
             byte[] tempItems = new byte[items.length - 1];
             System.arraycopy(items, 0, tempItems, 0, i);
@@ -91,7 +90,7 @@ public final class Bytes extends FixedVector {
 
         public Bytes build() {
             byte[] buf = new byte[4 + items.length * ITEM_SIZE];
-            MoleculeUtils.setSize(items.length, buf, 0);;
+            MoleculeUtils.setInt(items.length, buf, 0);;
             MoleculeUtils.setBytes(items, buf, 4);
             Bytes v = new Bytes();
             v.buf = buf;

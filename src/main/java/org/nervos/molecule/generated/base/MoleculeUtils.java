@@ -5,7 +5,7 @@ public class MoleculeUtils {
         System.arraycopy(from, 0, to, start, from.length);
     }
 
-    public static void setSize(int size, byte[] to, int start) {
+    public static void setInt(int size, byte[] to, int start) {
         byte[] from = new byte[4];
         from[3] = (byte) ((size >> 24) & 0xff);
         from[2] = (byte) ((size >> 16) & 0xff);

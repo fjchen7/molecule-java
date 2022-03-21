@@ -131,10 +131,10 @@ public final class Block extends Table {
                 size += fieldsSize[i];
             }
             byte[] buf = new byte[size];;
-            MoleculeUtils.setSize(size, buf, 0);
+            MoleculeUtils.setInt(size, buf, 0);
             int start = 4;
             for (int i = 0; i < FIELD_COUNT; i++) {
-                MoleculeUtils.setSize(fieldsSize[i], buf, start);
+                MoleculeUtils.setInt(offsets[i], buf, start);
                 start += 4;
             }
             for (int i = 0; i < FIELD_COUNT; i++) {

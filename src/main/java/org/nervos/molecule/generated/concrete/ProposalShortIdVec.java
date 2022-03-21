@@ -17,11 +17,13 @@ public final class ProposalShortIdVec extends FixedVector {
     private ProposalShortIdVec() {
     }
 
+    @Override
+    public int getItemSize() {
+        return ITEM_SIZE;
+    }
+
     @Nonnull
     public ProposalShortId get(int i) {
-        if (i >= items.length) {
-            throw new IndexOutOfBoundsException("Index out of range: " + items.length);
-        }
         return items[i];
     }
 
@@ -77,16 +79,13 @@ public final class ProposalShortIdVec extends FixedVector {
 
         public Builder set(int i, @Nonnull ProposalShortId item) {
             Objects.requireNonNull(item);
-            if (i >= items.length) {
-                throw new IndexOutOfBoundsException("Index out of range: " + items.length);
-            }
             items[i] = item;
             return this;
         }
 
         public Builder remove(int i) {
-            if (i >= items.length) {
-                throw new IndexOutOfBoundsException("Index out of range: " + items.length);
+            if (i < 0 || i >= items.length) {
+                throw new ArrayIndexOutOfBoundsException(i);
             }
             ProposalShortId[] tempItems = new ProposalShortId[items.length - 1];
             System.arraycopy(items, 0, tempItems, 0, i);
@@ -97,7 +96,7 @@ public final class ProposalShortIdVec extends FixedVector {
 
         public ProposalShortIdVec build() {
             byte[] buf = new byte[4 + items.length * ITEM_SIZE];
-            MoleculeUtils.setSize(items.length, buf, 0);;
+            MoleculeUtils.setInt(items.length, buf, 0);;
             int start = 4;
             for (int i = 0; i < items.length; i++) {
                 MoleculeUtils.setBytes(items[i].getRawData(), buf, start);

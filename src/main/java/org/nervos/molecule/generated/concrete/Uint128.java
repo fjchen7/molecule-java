@@ -21,9 +21,6 @@ public final class Uint128 extends Array {
 
     @Nonnull
     public byte get(int i) {
-        if (i >= ITEM_COUNT) {
-            throw new IndexOutOfBoundsException("Index out of range: " + ITEM_COUNT);
-        }
         return items[i];
     }
 
@@ -62,10 +59,11 @@ public final class Uint128 extends Array {
             if (buf.length != SIZE) {
                 throw new MoleculeException(SIZE, buf.length, Uint128.class);
             }
+            items = new byte[ITEM_COUNT];
             items = buf;
         }
 
-        public Builder setItem(int i, @Nonnull byte item) {
+        public Builder set(int i, @Nonnull byte item) {
             Objects.requireNonNull(item);
             items[i] = item;
             return this;
