@@ -4,25 +4,35 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.nervos.molecule.Generator;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class DataTest {
-    private String concretePackageName = "org.nervos.molecule.generated.concrete";
-    private String basePackageName = "org.nervos.molecule.generated.base";
-    private Class arrayClazz = Class.forName(basePackageName + ".Array");
-    private Class structClazz = Class.forName(basePackageName + ".Struct");
-    private Class tableClazz = Class.forName(basePackageName + ".Table");
-    private Class vectorClazz = Class.forName(basePackageName + ".Vector");
-    private Class unionClazz = Class.forName(basePackageName + ".Union");
-    private Class moleculeClazz = Class.forName(basePackageName + ".Molecule");
+    private static String concretePackageName = "org.nervos.molecule.generated.concrete";
+    private static String basePackageName = "org.nervos.molecule.generated.base";
 
     public DataTest() throws ClassNotFoundException {
+    }
+
+    @BeforeAll
+    public void generateCode() throws IOException, ClassNotFoundException {
+        Path schemaPath = Paths.get("src/main/resources/types.mol");
+        Path codePath = Paths.get("src/main/java");
+        Generator.generate(schemaPath, "org.nervos.molecule.generated", codePath);
     }
 
     @Test
@@ -83,6 +93,12 @@ public class DataTest {
         }
         Method m = clazz.getMethod("builder");
         java.lang.Object builder = m.invoke(null);
+
+        Class arrayClazz = Class.forName(basePackageName + ".Array");
+        Class tableClazz = Class.forName(basePackageName + ".Table");
+        Class vectorClazz = Class.forName(basePackageName + ".Vector");
+        Class unionClazz = Class.forName(basePackageName + ".Union");
+        Class structClazz = Class.forName(basePackageName + ".Struct");
 
         if (arrayClazz.isAssignableFrom(clazz)) {
             Class itemClazz = (Class) clazz.getField("ITEM_TYPE").get(null);
@@ -155,7 +171,8 @@ public class DataTest {
         System.out.println(name + ": PASSED");
     }
 
-    private byte[] getRawData(Object instance) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    private byte[] getRawData(Object instance) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, ClassNotFoundException {
+        Class moleculeClazz = Class.forName(basePackageName + ".Molecule");
         Method m = moleculeClazz.getMethod("getRawData");
         return (byte[]) m.invoke(instance);
     }
