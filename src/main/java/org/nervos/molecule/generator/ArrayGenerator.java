@@ -40,7 +40,7 @@ public class ArrayGenerator extends AbstractConcreteGenerator {
 
         itemCount = FieldSpec.builder(int.class, "ITEM_COUNT")
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                .initializer("$L", descriptor.getSize())
+                .initializer("$L", descriptor.getSize() / descriptor.getFields().get(0).getTypeDescriptor().getSize())
                 .build();
 
         size = FieldSpec.builder(int.class, "SIZE")
@@ -111,7 +111,8 @@ public class ArrayGenerator extends AbstractConcreteGenerator {
         MethodSpec.Builder constructorBufBuilder = constructorBufBuilder()
                 .beginControlFlow("if (buf.length != $N)", size)
                 .addStatement("throw new $T($N, buf.length, $T.class)", base.classNameMoleculeException, size, name)
-                .endControlFlow();
+                .endControlFlow()
+                .addStatement("$N = new $T[$N]", items, itemTypeName, itemCount);
 
         if (itemTypeName != TypeName.BYTE) {
             constructorBufBuilder
@@ -123,7 +124,7 @@ public class ArrayGenerator extends AbstractConcreteGenerator {
             constructorBufBuilder.addStatement("items = buf");
         }
 
-        MethodSpec setItem = MethodSpec.methodBuilder("setItem")
+        MethodSpec setItem = MethodSpec.methodBuilder("set")
                 .addModifiers(Modifier.PUBLIC)
                 .returns(builderName)
                 .addParameter(int.class, "i")

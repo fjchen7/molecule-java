@@ -5,12 +5,13 @@ import org.nervos.molecule.MoleculeType;
 import org.nervos.molecule.descriptor.FieldDescriptor;
 import org.nervos.molecule.descriptor.TypeDescriptor;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.lang.model.element.Modifier;
 import java.util.*;
 
 public class UnionGenerator extends AbstractConcreteGenerator {
     FieldSpec itemClasses;
-    FieldSpec optionalItemClasses;
     List<TypeDescriptor> fieldTypeDescriptors;
 
     public UnionGenerator(BaseTypeGenerator base, TypeDescriptor descriptor, String packageName) {
@@ -28,10 +29,6 @@ public class UnionGenerator extends AbstractConcreteGenerator {
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .initializer("new $T<>()", ArrayList.class)
                 .build();
-        optionalItemClasses = FieldSpec.builder(ParameterizedTypeName.get(Set.class, Class.class), "OPTIONAL_ITEM_CLASSES")
-                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                .initializer("new $T<>()", HashSet.class)
-                .build();
 
         CodeBlock.Builder staticBlockBuilder = CodeBlock.builder();
 
@@ -39,18 +36,12 @@ public class UnionGenerator extends AbstractConcreteGenerator {
             TypeDescriptor fieldTypeDescriptor = fieldDescriptor.getTypeDescriptor();
             TypeName fieldTypeName = getTypeName(fieldTypeDescriptor);
             staticBlockBuilder.addStatement("$N.add($T.class)", itemClasses, fieldTypeName);
-
-            if (fieldTypeDescriptor.getMoleculeType() == MoleculeType.OPTION) {
-                staticBlockBuilder.addStatement("$N.add($T.class)", optionalItemClasses, fieldTypeName);
-            }
         }
         staticBlockBuilder
-                .addStatement("$N = $T.unmodifiableList($N)", itemClasses, Collections.class, itemClasses)
-                .addStatement("$N = $T.unmodifiableSet($N)", optionalItemClasses, Collections.class, optionalItemClasses);
+                .addStatement("$N = $T.unmodifiableList($N)", itemClasses, Collections.class, itemClasses);
 
         typeBuilder
                 .addField(itemClasses)
-                .addField(optionalItemClasses)
                 .addStaticBlock(staticBlockBuilder.build());
     }
 
@@ -125,23 +116,41 @@ public class UnionGenerator extends AbstractConcreteGenerator {
             }
         }
 
+        typeBuilderBuilder
+                .addMethod(constructorBuilder.build())
+                .addMethod(constructorBufBuilder.build());
 
-        MethodSpec setItem = MethodSpec.methodBuilder("setItem")
-                .addParameter(Object.class, "item")
-                .addModifiers(Modifier.PUBLIC)
-                .returns(builderName)
-                .addStatement("int typeId = $N.indexOf(item.getClass())", itemClasses)
-                .beginControlFlow("if (typeId == -1)", itemClasses)
-                .addStatement("throw new $T(\"Invalid item class\")", base.classNameMoleculeException)
-                .endControlFlow()
-                .addStatement("this.item = item")
-                .addStatement("this.typeId = typeId")
-                .addStatement("return this")
-                .build();
+        for (int i = 0; i < fieldTypeDescriptors.size(); i++) {
+            TypeDescriptor itemTypeDescriptor = fieldTypeDescriptors.get(i);
+
+            String itemName = snakeCaseToCamelCase(itemTypeDescriptor.getName());
+            TypeName itemTypeName = getTypeName(itemTypeDescriptor);
+
+            MethodSpec.Builder setterBuilder = MethodSpec.methodBuilder("to" + upperFirstChar(itemName))
+                    .addModifiers(Modifier.PUBLIC)
+                    .returns(builderName);
+
+            if (!(fieldTypeDescriptors.get(i).getMoleculeType() == MoleculeType.OPTION)) {
+                setterBuilder
+                        .addParameter(ParameterSpec.builder(itemTypeName, "item")
+                                .addAnnotation(Nonnull.class).build())
+                        .addStatement("$T.requireNonNull(item)", Objects.class);
+            } else {
+                setterBuilder.addParameter(ParameterSpec.builder(itemTypeName, "item")
+                        .addAnnotation(Nullable.class).build());
+            }
+            setterBuilder
+                    .addStatement("this.typeId = $L", i)
+                    .addStatement("this.item = item", itemName)
+                    .addStatement("return this")
+                    .build();
+            typeBuilderBuilder.addMethod(setterBuilder.build());
+
+        }
 
         MethodSpec.Builder buildBuilder = methodBuildBuilder()
                 .addStatement("byte[] buf")
-                .addStatement("$T clazz = item.getClass()", Class.class);
+                .addStatement("$T clazz = $N.get(typeId)", Class.class, itemClasses);
 
         buildBuilder
                 .beginControlFlow("if (item == null)")
@@ -183,9 +192,6 @@ public class UnionGenerator extends AbstractConcreteGenerator {
                 .addStatement("return u");
 
         typeBuilderBuilder
-                .addMethod(constructorBuilder.build())
-                .addMethod(constructorBufBuilder.build())
-                .addMethod(setItem)
                 .addMethod(buildBuilder.build());
 
     }

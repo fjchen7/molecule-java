@@ -221,7 +221,7 @@ public class TableGenerator extends AbstractConcreteGenerator {
         buildBuilder
                 .addStatement("int start = 4")
                 .beginControlFlow("for (int i = 0; i < $N; i++)", fieldCount)
-                .addStatement("$T.setSize(fieldsSize[i], buf, start)", base.classNameMoleculeUtils)
+                .addStatement("$T.setSize(offsets[i], buf, start)", base.classNameMoleculeUtils)
                 .addStatement("start += 4")
                 .endControlFlow();
 
