@@ -18,7 +18,6 @@ public class BaseTypeGenerator extends AbstractGenerator {
     public ClassName classNameDynamicVector;
     public ClassName classNameFixedVector;
     public ClassName classNameUnion;
-    public ClassName classNameOption;
     public ClassName classNameMoleculeException;
     public ClassName classNameMoleculeUtils;
 
@@ -44,7 +43,6 @@ public class BaseTypeGenerator extends AbstractGenerator {
         typeSpecs.add(generateBaseFixedVector());
         typeSpecs.add(generateBaseTable());
         typeSpecs.add(generateBaseUnion());
-        typeSpecs.add(generateBaseOption());
         typeSpecs.add(generateMoleculeException());
         typeSpecs.add(generateMoleculeUtils());
         return typeSpecs;
@@ -169,30 +167,6 @@ public class BaseTypeGenerator extends AbstractGenerator {
                 .build();
         classNameUnion = ClassName.get(packageName, union.name);
         return union;
-    }
-
-    private TypeSpec generateBaseOption() {
-        TypeVariableName t = TypeVariableName.get("T");
-        TypeSpec option = TypeSpec.classBuilder("Option")
-                .addTypeVariable(t)
-                .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
-                .superclass(classNameMolecule)
-                .addField(FieldSpec.builder(t, "item")
-                        .addModifiers(Modifier.PROTECTED)
-                        .build())
-                .addMethod(MethodSpec.methodBuilder("isNull")
-                        .addModifiers(Modifier.PUBLIC)
-                        .returns(boolean.class)
-                        .addStatement("return item == null")
-                        .build())
-                .addMethod(MethodSpec.methodBuilder("getItem")
-                        .addModifiers(Modifier.PUBLIC)
-                        .returns(t)
-                        .addStatement("return item")
-                        .build())
-                .build();
-        classNameOption = ClassName.get(packageName, option.name);
-        return option;
     }
 
     public TypeSpec generateMoleculeException() {
