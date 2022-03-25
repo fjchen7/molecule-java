@@ -21,11 +21,11 @@ import java.util.Map;
 import java.util.Objects;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class DataTest {
+public class SerializationTest {
     private static String concretePackageName = "org.nervos.molecule.generated.concrete";
     private static String basePackageName = "org.nervos.molecule.generated.base";
 
-    public DataTest() throws ClassNotFoundException {
+    public SerializationTest() throws ClassNotFoundException {
     }
 
     @BeforeAll
@@ -52,12 +52,12 @@ public class DataTest {
     void testSimple() throws IOException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, NoSuchFieldException, ClassNotFoundException {
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
         File source = new File("src/test/resources/simple.yaml");
-        List<Map<String, java.lang.Object>> cases
-                = mapper.readValue(source, new TypeReference<List<Map<String, java.lang.Object>>>() {
+        List<Map<String, Object>> cases
+                = mapper.readValue(source, new TypeReference<List<Map<String, Object>>>() {
         });
 
         System.out.println("[Simple Cases] >>>");
-        for (Map<String, java.lang.Object> c : cases) {
+        for (Map<String, Object> c : cases) {
             testSimpleCase(c);
         }
     }
@@ -79,7 +79,7 @@ public class DataTest {
         System.out.println(name + ": PASSED");
     }
 
-    private void testSimpleCase(Map<String, java.lang.Object> testData) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException, NoSuchFieldException, ClassNotFoundException {
+    private void testSimpleCase(Map<String, Object> testData) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException, NoSuchFieldException, ClassNotFoundException {
         String name = (String) testData.get("name");
 
         Class clazz;
@@ -92,7 +92,7 @@ public class DataTest {
             return;
         }
         Method m = clazz.getMethod("builder");
-        java.lang.Object builder = m.invoke(null);
+        Object builder = m.invoke(null);
 
         Class arrayClazz = Class.forName(basePackageName + ".Array");
         Class tableClazz = Class.forName(basePackageName + ".Table");
@@ -120,7 +120,7 @@ public class DataTest {
             for (String d : data) {
                 byte[] v = hexToBytes(d);
                 if (v.length == 0) {
-                    f2.invoke(builder, new java.lang.Object[]{null});
+                    f2.invoke(builder, new Object[]{null});
                 } else {
                     if (itemClazz == byte.class || itemClazz == Byte.class) {
                         f2.invoke(builder, v[0]);
@@ -179,7 +179,7 @@ public class DataTest {
 
     private Object newMoleculeInstance(Class clazz, byte[] buf) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         Class builderClass = Class.forName(clazz.getName() + "$Builder");
-        java.lang.Object builder;
+        Object builder;
         if (buf == null || buf.length == 0) {
             return null;
         } else {
@@ -193,7 +193,7 @@ public class DataTest {
 
     private Object newDefaultMoleculeInstance(Class clazz) throws NoSuchMethodException, ClassNotFoundException, InvocationTargetException, IllegalAccessException {
         Class builderClass = Class.forName(clazz.getName() + "$Builder");
-        java.lang.Object builder;
+        Object builder;
 
         Method m = clazz.getMethod("builder");
         builder = m.invoke(null);
