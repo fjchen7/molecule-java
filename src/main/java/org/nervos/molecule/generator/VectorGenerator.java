@@ -87,6 +87,23 @@ public abstract class VectorGenerator extends AbstractConcreteGenerator {
         .addStatement("return this");
     MethodSpec methodAdd = methodAddBuilder.build();
 
+    MethodSpec.Builder methodAddBatchBuilder =
+        MethodSpec.methodBuilder("add")
+            .addModifiers(Modifier.PUBLIC)
+            .returns(builderName)
+            .addParameter(
+                ParameterSpec.builder(ArrayTypeName.of(itemTypeName), "items")
+                    .addAnnotation(Nonnull.class).build());
+
+    methodAddBatchBuilder
+        .addStatement("$T.requireNonNull(items)", Objects.class)
+        .addStatement("$T[] originalItems = this.items", itemTypeName)
+        .addStatement("this.items = new $T[originalItems.length + items.length]", itemTypeName)
+        .addStatement("$T.arraycopy(originalItems, 0, this.items, 0, originalItems.length)", System.class)
+        .addStatement("$T.arraycopy(items, 0, this.items, originalItems.length, items.length)", System.class)
+        .addStatement("return this");
+    MethodSpec methodAddBatch = methodAddBatchBuilder.build();
+
     MethodSpec.Builder methodSetBuilder =
         MethodSpec.methodBuilder("set")
             .addModifiers(Modifier.PUBLIC)
@@ -126,6 +143,7 @@ public abstract class VectorGenerator extends AbstractConcreteGenerator {
                 .addModifiers(Modifier.PRIVATE)
                 .build())
         .addMethod(methodAdd)
+        .addMethod(methodAddBatch)
         .addMethod(methodSet)
         .addMethod(methodRemove);
 
