@@ -1,11 +1,12 @@
 package org.nervos.molecule.generator;
 
 import com.squareup.javapoet.*;
-import java.util.Objects;
+import org.nervos.molecule.descriptor.TypeDescriptor;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.lang.model.element.Modifier;
-import org.nervos.molecule.descriptor.TypeDescriptor;
+import java.util.Objects;
 
 public abstract class VectorGenerator extends AbstractConcreteGenerator {
   protected TypeName itemTypeName;
@@ -79,10 +80,10 @@ public abstract class VectorGenerator extends AbstractConcreteGenerator {
           ParameterSpec.builder(itemTypeName, "item").addAnnotation(Nullable.class).build());
     }
     methodAddBuilder
-        .addStatement("$T[] tempItems = new $T[items.length + 1]", itemTypeName, itemTypeName)
-        .addStatement("$T.arraycopy(items, 0, tempItems, 0, items.length)", System.class)
-        .addStatement("tempItems[items.length] = item;")
-        .addStatement("items = tempItems")
+        .addStatement("$T[] originalItems = items", itemTypeName)
+        .addStatement("items = new $T[originalItems.length + 1]", itemTypeName)
+        .addStatement("$T.arraycopy(originalItems, 0, items, 0, originalItems.length)", System.class)
+        .addStatement("items[items.length - 1] = item;")
         .addStatement("return this");
     MethodSpec methodAdd = methodAddBuilder.build();
 
@@ -111,11 +112,11 @@ public abstract class VectorGenerator extends AbstractConcreteGenerator {
             .beginControlFlow("if (i < 0 || i >= items.length)")
             .addStatement("throw new $T(i)", ArrayIndexOutOfBoundsException.class)
             .endControlFlow()
-            .addStatement("$T[] tempItems = new $T[items.length - 1]", itemTypeName, itemTypeName)
-            .addStatement("$T.arraycopy(items, 0, tempItems, 0, i)", System.class)
+            .addStatement("$T[] originalItems = items", itemTypeName)
+            .addStatement("items = new $T[originalItems.length - 1]", itemTypeName)
+            .addStatement("$T.arraycopy(originalItems, 0, items, 0, i)", System.class)
             .addStatement(
-                "$T.arraycopy(items, i + 1, tempItems, i, items.length - i -1)", System.class)
-            .addStatement("items = tempItems")
+                "$T.arraycopy(originalItems, i + 1, items, i, originalItems.length - i -1)", System.class)
             .addStatement("return this")
             .build();
 
