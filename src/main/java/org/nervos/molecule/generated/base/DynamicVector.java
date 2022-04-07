@@ -1,3 +1,4 @@
 package org.nervos.molecule.generated.base;
 
-public abstract class DynamicVector extends Vector {}
+public abstract class DynamicVector extends Vector {
+}
