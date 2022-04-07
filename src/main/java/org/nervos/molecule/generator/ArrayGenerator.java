@@ -164,7 +164,7 @@ public class ArrayGenerator extends AbstractConcreteGenerator {
           .addStatement("byte[] buf = new byte[$N]", size)
           .beginControlFlow("for (int i = 0; i < $N; i++)", itemCount)
           .addStatement(
-              "$T.setBytes($N[i].getRawData(), buf, i * $N)",
+              "$T.setBytes($N[i].toByteArray(), buf, i * $N)",
               base.classNameMoleculeUtils,
               items,
               itemSize)

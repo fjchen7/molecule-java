@@ -76,7 +76,7 @@ public class SerializationTest {
       return;
     }
     Object instance = newDefaultMoleculeInstance(clazz);
-    String hex = bytesToHex(getRawData(instance));
+    String hex = bytesToHex(toByteArray(instance));
     Assertions.assertEquals(expected, hex);
     System.out.println(name + ": PASSED");
   }
@@ -173,17 +173,17 @@ public class SerializationTest {
 
     Method f1 = builderClazz.getMethod("build");
     Object instance = f1.invoke(builder);
-    String hex = bytesToHex(getRawData(instance));
+    String hex = bytesToHex(toByteArray(instance));
     String expected = formatHexString((String) testData.get("expected"));
     Assertions.assertEquals(expected, hex);
     System.out.println(name + ": PASSED");
   }
 
-  private byte[] getRawData(Object instance)
+  private byte[] toByteArray(Object instance)
       throws NoSuchMethodException, InvocationTargetException, IllegalAccessException,
           ClassNotFoundException {
     Class moleculeClazz = Class.forName(basePackageName + ".Molecule");
-    Method m = moleculeClazz.getMethod("getRawData");
+    Method m = moleculeClazz.getMethod("toByteArray");
     return (byte[]) m.invoke(instance);
   }
 

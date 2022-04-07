@@ -129,7 +129,7 @@ public class StructGenerator extends AbstractConcreteGenerator {
         buildBuilder.addStatement("buf[offsets[$L]] = $L", i, field.name);
       } else {
         buildBuilder.addStatement(
-            "$T.setBytes($L.getRawData(), buf, offsets[$L])",
+            "$T.setBytes($L.toByteArray(), buf, offsets[$L])",
             base.classNameMoleculeUtils,
             field.name,
             i);

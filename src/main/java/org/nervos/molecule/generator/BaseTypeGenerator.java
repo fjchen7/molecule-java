@@ -54,7 +54,7 @@ public class BaseTypeGenerator extends AbstractGenerator {
             .addField(
                 FieldSpec.builder(byte[].class, "buf").addModifiers(Modifier.PROTECTED).build())
             .addMethod(
-                MethodSpec.methodBuilder("getRawData")
+                MethodSpec.methodBuilder("toByteArray")
                     .addModifiers(Modifier.PUBLIC)
                     .returns(byte[].class)
                     .addStatement("return buf")
@@ -63,7 +63,7 @@ public class BaseTypeGenerator extends AbstractGenerator {
                 MethodSpec.methodBuilder("getSize")
                     .addModifiers(Modifier.PUBLIC)
                     .returns(int.class)
-                    .addStatement("return getRawData().length")
+                    .addStatement("return toByteArray().length")
                     .build())
             .build();
     classNameMolecule = ClassName.get(packageName, molecule.name);

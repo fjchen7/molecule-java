@@ -91,7 +91,7 @@ public class FixedVectorGenerator extends VectorGenerator {
           .addStatement("int start = 4")
           .beginControlFlow("for (int i = 0; i < items.length; i++)")
           .addStatement(
-              "$T.setBytes(items[i].getRawData(), buf, start)", base.classNameMoleculeUtils)
+              "$T.setBytes(items[i].toByteArray(), buf, start)", base.classNameMoleculeUtils)
           .addStatement("start += $N", itemSize)
           .endControlFlow();
     } else {

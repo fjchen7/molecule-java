@@ -115,14 +115,14 @@ public class DynamicVectorGenerator extends VectorGenerator {
       } else {
         buildBuilder
             .addStatement(
-                "$T.setBytes(items[i].getRawData(), buf, start);", base.classNameMoleculeUtils)
+                "$T.setBytes(items[i].toByteArray(), buf, start);", base.classNameMoleculeUtils)
             .addStatement("start += items[i].getSize()");
       }
       buildBuilder.endControlFlow();
     } else {
       buildBuilder
           .addStatement(
-              "$T.setBytes(items[i].getRawData(), buf, start);", base.classNameMoleculeUtils)
+              "$T.setBytes(items[i].toByteArray(), buf, start);", base.classNameMoleculeUtils)
           .addStatement("start += items[i].getSize()");
     }
     buildBuilder.endControlFlow();

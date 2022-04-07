@@ -228,10 +228,10 @@ public class TableGenerator extends AbstractConcreteGenerator {
             field.name);
       } else {
         if (!isOption.get(i)) {
-          buildBuilder.addStatement("fieldsBuf[$L] = $L.getRawData()", i, field.name);
+          buildBuilder.addStatement("fieldsBuf[$L] = $L.toByteArray()", i, field.name);
         } else {
           buildBuilder.addStatement(
-              "fieldsBuf[$L] = ($L == null ? new byte[]{} : $L.getRawData())",
+              "fieldsBuf[$L] = ($L == null ? new byte[]{} : $L.toByteArray())",
               i,
               field.name,
               field.name);
