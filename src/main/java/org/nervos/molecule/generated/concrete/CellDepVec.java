@@ -3,6 +3,7 @@ package org.nervos.molecule.generated.concrete;
 import java.util.Arrays;
 import java.util.Objects;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import org.nervos.molecule.generated.base.FixedVector;
 import org.nervos.molecule.generated.base.MoleculeException;
 import org.nervos.molecule.generated.base.MoleculeUtils;
@@ -25,6 +26,11 @@ public final class CellDepVec extends FixedVector {
     @Nonnull
     public CellDep get(int i) {
         return items[i];
+    }
+
+    @Nullable
+    public CellDep[] getItems() {
+        return items;
     }
 
     @Override

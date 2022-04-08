@@ -2,6 +2,7 @@ package org.nervos.molecule.generated.concrete;
 
 import java.util.Objects;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import org.nervos.molecule.generated.base.Array;
 import org.nervos.molecule.generated.base.MoleculeException;
 
@@ -22,6 +23,11 @@ public final class Byte32 extends Array {
     @Nonnull
     public byte get(int i) {
         return items[i];
+    }
+
+    @Nullable
+    public byte[] getItems() {
+        return items;
     }
 
     @Override

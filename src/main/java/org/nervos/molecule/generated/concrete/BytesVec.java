@@ -3,6 +3,7 @@ package org.nervos.molecule.generated.concrete;
 import java.util.Arrays;
 import java.util.Objects;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import org.nervos.molecule.generated.base.DynamicVector;
 import org.nervos.molecule.generated.base.MoleculeException;
 import org.nervos.molecule.generated.base.MoleculeUtils;
@@ -18,6 +19,11 @@ public final class BytesVec extends DynamicVector {
     @Nonnull
     public Bytes get(int i) {
         return items[i];
+    }
+
+    @Nullable
+    public Bytes[] getItems() {
+        return items;
     }
 
     @Override
