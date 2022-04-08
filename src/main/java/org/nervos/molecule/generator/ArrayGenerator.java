@@ -1,11 +1,13 @@
 package org.nervos.molecule.generator;
 
 import com.squareup.javapoet.*;
+import org.nervos.molecule.descriptor.TypeDescriptor;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.lang.model.element.Modifier;
 import java.util.Arrays;
 import java.util.Objects;
-import javax.annotation.Nonnull;
-import javax.lang.model.element.Modifier;
-import org.nervos.molecule.descriptor.TypeDescriptor;
 
 public class ArrayGenerator extends AbstractConcreteGenerator {
   TypeName itemTypeName;
@@ -66,6 +68,14 @@ public class ArrayGenerator extends AbstractConcreteGenerator {
             .addStatement("return $N[i]", items)
             .build();
 
+    MethodSpec methodGetItems =
+        MethodSpec.methodBuilder("getItems")
+            .addModifiers(Modifier.PUBLIC)
+            .returns(ArrayTypeName.of(itemTypeName))
+            .addAnnotation(Nullable.class)
+            .addStatement("return $N", items)
+            .build();
+
     MethodSpec methodGetItemCount =
         MethodSpec.methodBuilder("getItemCount")
             .addModifiers(Modifier.PUBLIC)
@@ -97,6 +107,7 @@ public class ArrayGenerator extends AbstractConcreteGenerator {
         .addField(size)
         .addField(items)
         .addMethod(methodGet)
+        .addMethod(methodGetItems)
         .addMethod(methodGetItemCount)
         .addMethod(methodGetItemSize)
         .addMethod(methodGetItemType);

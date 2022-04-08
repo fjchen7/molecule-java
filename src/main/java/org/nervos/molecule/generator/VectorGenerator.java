@@ -39,6 +39,14 @@ public abstract class VectorGenerator extends AbstractConcreteGenerator {
             .addStatement("return $N[i]", items)
             .build();
 
+    MethodSpec getItems =
+        MethodSpec.methodBuilder("getItems")
+            .addModifiers(Modifier.PUBLIC)
+            .returns(ArrayTypeName.of(itemTypeName))
+            .addAnnotation(Nullable.class)
+            .addStatement("return $N", items)
+            .build();
+
     MethodSpec getItemCount =
         MethodSpec.methodBuilder("getItemCount")
             .addModifiers(Modifier.PUBLIC)
@@ -59,6 +67,7 @@ public abstract class VectorGenerator extends AbstractConcreteGenerator {
         .addField(itemType)
         .addField(items)
         .addMethod(get)
+        .addMethod(getItems)
         .addMethod(getItemCount)
         .addMethod(getItemType);
   }
